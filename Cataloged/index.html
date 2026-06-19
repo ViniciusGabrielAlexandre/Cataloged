@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MediaNexus Pro - MD3</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
+
 <body class="md3-dynamic-theme">
 
   <header class="md3-app-bar">
@@ -110,6 +113,7 @@
             <option value="jogos">Jogo</option>
           </select>
         </div>
+        
         <div id="dynamic-fields-container" class="md3-form-group"></div>
         <div class="md3-dialog-actions">
           <button type="button" id="btn-close-create" class="md3-btn md3-btn-text">Cancelar</button>
@@ -121,7 +125,8 @@
 
   <div id="auth-modal" class="md3-dialog-overlay hidden">
     <div class="md3-dialog">
-      <h3 class="md3-dialog-title">Acessar Conta</h3>
+      <h3 class="md3-dialog-title">Acessar Conta (Multi-dispositivo)</h3>
+      <p class="md3-dialog-support-text">Introduza o seu e-mail de utilizador para carregar a sua coleção a partir da nuvem.</p>
       <form id="auth-form" class="md3-form">
         <div class="md3-text-field">
           <input type="email" id="auth-email" required placeholder=" " />
@@ -139,6 +144,15 @@
     </div>
   </div>
 
+  <div id="media-details-modal" class="md3-dialog-overlay hidden">
+    <div class="md3-dialog" style="max-width: 600px;">
+      <button id="btn-close-details" class="md3-btn md3-btn-text" style="align-self:flex-end;">
+        <span class="material-symbols-outlined">close</span> Fechar
+      </button>
+      <div id="media-details-content"></div>
+    </div>
+  </div>
   <script type="module" src="js/app.js"></script>
 </body>
+
 </html>
