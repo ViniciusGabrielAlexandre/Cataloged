@@ -9,6 +9,78 @@
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
   <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* ── Avatar clicável ─────────────────────────────────────── */
+    .profile-avatar-uploader {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border-radius: 9999px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .avatar-wrapper img {
+      width: 100%;
+      height: 100%;
+      border-radius: 9999px;
+      object-fit: cover;
+      border: 3px solid var(--md-sys-color-primary);
+      display: block;
+      transition: filter 0.2s ease;
+    }
+
+    .avatar-overlay {
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .avatar-overlay .material-symbols-outlined {
+      color: #fff;
+      font-size: 28px;
+    }
+
+    .avatar-wrapper:hover img       { filter: brightness(0.7); }
+    .avatar-wrapper:hover .avatar-overlay { opacity: 1; }
+
+    /* ── Lado direito do uploader ────────────────────────────── */
+    .avatar-info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .avatar-hint {
+      margin: 0;
+      font-size: 13px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .avatar-url-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar-url-row .md3-btn {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+  </style>
 </head>
 
 <body class="md3-dynamic-theme">
@@ -28,7 +100,7 @@
         <a href="#/jogos" class="md3-tab-link" data-route="jogos">Jogos</a>
         <a href="#/minha-colecao" class="md3-tab-link private-route hidden" data-route="minha-colecao">Minha Coleção</a>
         <a href="#/config-perfil" class="md3-tab-link private-route hidden" data-route="config-perfil">Editar Perfil</a>
-        
+
         <button id="btn-open-create-media" class="md3-btn md3-btn-text private-route hidden" style="margin-left: auto;">
           <span class="material-symbols-outlined">add_circle</span> Criar Mídia
         </button>
@@ -63,21 +135,37 @@
     <section id="view-config-perfil" class="route-view hidden">
       <div class="md3-profile-settings-card">
         <h2 class="md3-headline">Preferências e Perfil</h2>
-        
+
         <div class="profile-avatar-uploader">
-          <img id="profile-avatar-preview" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150" alt="Avatar" />
-          <div>
-            <div class="md3-text-field" style="margin:0;">
-              <input type="url" id="input-avatar-url" placeholder=" " />
-              <label for="input-avatar-url">URL da Foto de Perfil</label>
+          <!-- Avatar clicável com overlay -->
+          <div class="avatar-wrapper" id="btn-avatar-file-picker" title="Clique para trocar a foto">
+            <img id="profile-avatar-preview"
+              src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"
+              alt="Avatar" />
+            <div class="avatar-overlay">
+              <span class="material-symbols-outlined">photo_camera</span>
             </div>
-            <button id="btn-save-avatar" class="md3-btn md3-btn-filled" style="margin-top:8px;">Atualizar Foto</button>
+          </div>
+
+          <input type="file" id="input-avatar-file" accept="image/*" style="display:none;" />
+
+          <div class="avatar-info">
+            <p class="avatar-hint">Clique na foto para escolher um arquivo</p>
+
+            <!-- Alternativa: URL manual -->
+            <div class="avatar-url-row">
+              <div class="md3-text-field" style="margin:0; flex:1;">
+                <input type="url" id="input-avatar-url" placeholder=" " />
+                <label for="input-avatar-url">Ou cole uma URL</label>
+              </div>
+              <button id="btn-save-avatar" class="md3-btn md3-btn-filled">Salvar URL</button>
+            </div>
           </div>
         </div>
 
         <div class="theme-customizer-section">
           <h3 style="font-size: 16px; margin-bottom: 12px;">Estilo do Aplicativo</h3>
-          
+
           <div class="md3-text-field">
             <select id="select-theme-mode" class="md3-select-input">
               <option value="dark">Modo Escuro (Preto)</option>
@@ -98,12 +186,34 @@
     </section>
   </main>
 
+  <!-- Modal: Criar Mídia -->
   <div id="create-media-modal" class="md3-dialog-overlay hidden">
     <div class="md3-dialog" style="max-width: 500px;">
       <h3 class="md3-dialog-title">Adicionar Nova Mídia</h3>
       <form id="create-media-form" class="md3-form">
-        <div class="md3-text-field"><input type="text" id="media-title" required placeholder=" " /><label>Título</label></div>
-        <div class="md3-text-field"><input type="url" id="media-poster" required placeholder=" " /><label>URL da Imagem</label></div>
+
+        <div class="md3-text-field">
+          <input type="text" id="media-title" required placeholder=" " />
+          <label>Título</label>
+        </div>
+
+        <!-- Campo de URL do poster -->
+        <div class="md3-text-field">
+          <input type="url" id="media-poster" placeholder=" " />
+          <label>URL da Imagem (ou escolha um arquivo abaixo)</label>
+        </div>
+
+        <!-- Botão para abrir explorador + preview da imagem selecionada -->
+        <div style="display:flex; gap:12px; align-items:center;">
+          <button type="button" id="btn-select-poster-file" class="md3-btn md3-btn-text" style="padding-left:0;">
+            <span class="material-symbols-outlined">upload</span> Escolher arquivo
+          </button>
+          <img id="poster-preview" style="width:60px; height:40px; object-fit:cover; border-radius:8px; display:none;" alt="Preview" />
+        </div>
+
+        <!-- Input de arquivo oculto para o poster -->
+        <input type="file" id="media-poster-file" accept="image/*" style="display:none;" />
+
         <div class="md3-text-field">
           <select id="media-type-select" required class="md3-select-input">
             <option value="" disabled selected>Selecione o Tipo</option>
@@ -113,16 +223,19 @@
             <option value="jogos">Jogo</option>
           </select>
         </div>
-        
+
         <div id="dynamic-fields-container" class="md3-form-group"></div>
+
         <div class="md3-dialog-actions">
           <button type="button" id="btn-close-create" class="md3-btn md3-btn-text">Cancelar</button>
           <button type="submit" class="md3-btn md3-btn-filled">Publicar</button>
         </div>
+
       </form>
     </div>
   </div>
 
+  <!-- Modal: Auth -->
   <div id="auth-modal" class="md3-dialog-overlay hidden">
     <div class="md3-dialog">
       <h3 class="md3-dialog-title">Acessar Conta (Multi-dispositivo)</h3>
@@ -144,6 +257,7 @@
     </div>
   </div>
 
+  <!-- Modal: Detalhes da mídia -->
   <div id="media-details-modal" class="md3-dialog-overlay hidden">
     <div class="md3-dialog" style="max-width: 600px;">
       <button id="btn-close-details" class="md3-btn md3-btn-text" style="align-self:flex-end;">
@@ -152,6 +266,7 @@
       <div id="media-details-content"></div>
     </div>
   </div>
+
   <script type="module" src="js/app.js"></script>
 </body>
 
